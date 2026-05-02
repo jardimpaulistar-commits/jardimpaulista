@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jardim Paulista — Cadastro de Moradores</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:  #0d3320;
+    --blue:  #166534;
+    --sky:   #22c55e;
+    --ice:   #dcfce7;
+    --white: #f0fdf4;
+    --gray:  #4b6358;
+    --light: #a7d9b8;
+    --accent:#f0a500;
+    --green: #15803d;
+    --red:   #d9354a;
+    --red-light: #fff0f0;
+    --card:  #ffffff;
+    --shadow:0 4px 24px rgba(13,51,32,.12);
+    --radius:12px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Sora',sans-serif;background:linear-gradient(140deg,#0d3320 0%,#166534 60%,#16a34a 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px 60px}
+
+  /* LOGIN */
+  #login-screen{position:fixed;inset:0;background:linear-gradient(140deg,#0d3320 0%,#166534 60%,#16a34a 100%);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+  .login-box{background:#fff;border-radius:18px;padding:44px 40px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;animation:fadeUp .4s ease both}
+  .login-logo{font-size:2.8rem;margin-bottom:6px}
+  .login-badge{display:inline-block;background:var(--accent);color:var(--navy);font-weight:700;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 14px;border-radius:99px;margin-bottom:14px}
+  .login-box h2{font-size:1.35rem;font-weight:700;color:var(--navy);margin-bottom:4px}
+  .login-box p{font-size:.85rem;color:var(--gray);margin-bottom:28px;font-weight:300}
+  .login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;text-align:left}
+  .login-field label{font-size:.72rem;font-weight:700;color:var(--gray);letter-spacing:.08em;text-transform:uppercase}
+  .login-field input{font-family:'Sora',sans-serif;font-size:.95rem;color:var(--navy);background:var(--white);border:1.5px solid var(--light);border-radius:8px;padding:11px 14px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+  .login-field input:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+  .login-field input.error{border-color:var(--red)}
+  .login-btn{width:100%;font-family:'Sora',sans-serif;font-size:.95rem;font-weight:700;padding:13px;border-radius:8px;border:none;cursor:pointer;background:var(--blue);color:#fff;box-shadow:0 4px 14px rgba(22,101,52,.3);transition:all .2s;margin-top:4px}
+  .login-btn:hover{background:var(--navy);transform:translateY(-1px)}
+  .login-error{display:none;background:#fff0f0;border:1.5px solid var(--red);border-radius:8px;padding:10px 14px;font-size:.83rem;font-weight:600;color:var(--red);margin-top:14px}
+  .login-error.show{display:block}
+  .login-footer{font-size:.72rem;color:#aaa;margin-top:20px}
+  #app-content{display:none}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+  header{width:100%;max-width:960px;text-align:center;margin-bottom:22px}
+  header .badge{display:inline-block;background:var(--accent);color:var(--navy);font-weight:700;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 16px;border-radius:99px;margin-bottom:8px}
+  header h1{color:#fff;font-size:clamp(1.5rem,4vw,2.1rem);font-weight:700;letter-spacing:-.02em}
+  header p{color:var(--light);font-size:.9rem;margin-top:6px;font-weight:300}
+
+  .tabs-nav{display:flex;gap:3px;width:100%;max-width:960px;background:rgba(0,0,0,.22);border-radius:var(--radius) var(--radius) 0 0;padding:8px 8px 0;flex-wrap:wrap}
+  .tab-btn{font-family:'Sora',sans-serif;font-size:.83rem;font-weight:600;padding:10px 20px;border:none;border-radius:8px 8px 0 0;cursor:pointer;transition:all .2s;color:var(--light);background:transparent;white-space:nowrap}
+  .tab-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+  .tab-btn.active{background:var(--card);color:var(--blue)}
+
+  .card{background:var(--card);border-radius:0 var(--radius) var(--radius) var(--radius);box-shadow:var(--shadow);width:100%;max-width:960px;padding:32px 38px;margin-bottom:20px}
+  @media(max-width:640px){.card{padding:20px 16px}}
+
+  .section-title{display:flex;align-items:center;gap:10px;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);border-bottom:2px solid var(--ice);padding-bottom:10px;margin-bottom:22px}
+  .section-title .dot{width:10px;height:10px;border-radius:50%;background:var(--sky);flex-shrink:0}
+  .mt{margin-top:28px}
+
+  .grid{display:grid;gap:18px}
+  .grid-2{grid-template-columns:1fr 1fr}
+  .grid-3{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:640px){.grid-2,.grid-3{grid-template-columns:1fr}}
+  .span-2{grid-column:span 2}
+
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:.73rem;font-weight:600;color:var(--gray);letter-spacing:.06em;text-transform:uppercase}
+  .field label .req{color:var(--red);margin-left:2px}
+  .field input,.field select,.field textarea{font-family:'Sora',sans-serif;font-size:.93rem;color:var(--navy);background:var(--white);border:1.5px solid var(--light);border-radius:8px;padding:10px 13px;transition:border-color .2s,box-shadow .2s;outline:none;width:100%}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sky);background:#fff;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+  .field input.error{border-color:var(--red)}
+  .field .hint{font-size:.71rem;color:var(--gray);font-family:'JetBrains Mono',monospace}
+  .field textarea{resize:vertical;min-height:75px}
+
+  /* ALERTA IDOSO */
+  .alerta-idoso{display:none;background:var(--red-light);border:2px solid var(--red);border-radius:10px;padding:14px 18px;margin-top:10px}
+  .alerta-idoso.visivel{display:flex;align-items:flex-start;gap:12px}
+  .alerta-idoso .alerta-ico{font-size:1.6rem;flex-shrink:0;margin-top:2px}
+  .alerta-idoso .alerta-txt{font-size:.88rem;font-weight:600;color:#8b0000;line-height:1.55}
+  .alerta-idoso .alerta-titulo{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:4px}
+
+  .people-wrap{display:grid;gap:10px}
+  .people-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;background:var(--ice);border-radius:8px;padding:9px 13px}
+  .people-num{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .people-row input{font-family:'Sora',sans-serif;font-size:.88rem;color:var(--navy);background:#fff;border:1.5px solid var(--light);border-radius:6px;padding:8px 11px;outline:none;transition:border-color .2s;width:100%}
+  .people-row input:focus{border-color:var(--sky)}
+  .btn-remove{background:none;border:none;cursor:pointer;color:#ccc;font-size:1rem;padding:2px 4px;transition:color .2s}
+  .btn-remove:hover{color:var(--red)}
+  .btn-add{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-family:'Sora',sans-serif;font-size:.8rem;font-weight:600;color:var(--blue);background:none;border:1.5px dashed var(--light);border-radius:7px;padding:7px 14px;cursor:pointer;transition:all .2s}
+  .btn-add:hover{border-color:var(--sky);color:var(--sky);background:var(--ice)}
+
+  .actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap}
+  .btn{font-family:'Sora',sans-serif;font-size:.88rem;font-weight:600;padding:11px 26px;border-radius:8px;border:none;cursor:pointer;transition:all .2s;letter-spacing:.02em}
+  .btn-outline{background:transparent;border:2px solid var(--light);color:var(--gray)}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+  .btn-primary{background:var(--blue);color:#fff;box-shadow:0 4px 14px rgba(22,101,52,.3)}
+  .btn-primary:hover{background:var(--navy);transform:translateY(-1px)}
+  .btn-export{background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(21,128,61,.3)}
+  .btn-export:hover{background:var(--navy);transform:translateY(-1px)}
+  .btn-danger{background:var(--red);color:#fff}
+  .btn-danger:hover{background:#b91c2c;transform:translateY(-1px)}
+  .btn-wpp{display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-family:'Sora',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none}
+  .btn-wpp:hover{background:#128C7E;transform:translateY(-1px)}
+  .btn-wpp svg{width:16px;height:16px;fill:#fff;flex-shrink:0}
+
+  .search-bar{position:relative;margin-bottom:20px}
+  .search-bar input{width:100%;font-family:'Sora',sans-serif;font-size:.95rem;color:var(--navy);background:var(--white);border:1.5px solid var(--light);border-radius:10px;padding:12px 18px 12px 44px;outline:none;transition:border-color .2s,box-shadow .2s}
+  .search-bar input:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+  .search-bar .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;pointer-events:none}
+
+  .list-grid{display:grid;gap:12px}
+  .cond-card{background:var(--white);border:1.5px solid var(--ice);border-radius:10px;padding:14px 18px;cursor:pointer;transition:all .2s;display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
+  .cond-card:hover{border-color:var(--sky);box-shadow:0 4px 16px rgba(34,197,94,.15);transform:translateY(-1px)}
+  .cond-card.idoso{border-left:4px solid var(--red)}
+  .cond-name{font-weight:700;color:var(--navy);font-size:.97rem}
+  .cond-meta{font-size:.78rem;color:var(--gray);margin-top:3px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .idoso-badge{display:inline-flex;align-items:center;gap:4px;background:#fff0f0;color:var(--red);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid #ffcdd2}
+  .tag{display:inline-block;font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--ice);color:var(--blue)}
+  .arrow{font-size:1.3rem;color:var(--light);font-weight:700}
+  .cond-card:hover .arrow{color:var(--sky)}
+
+  .counter-bar{display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .counter-item{background:var(--ice);border-radius:8px;padding:10px 16px;display:flex;flex-direction:column;gap:2px}
+  .counter-item .num{font-size:1.4rem;font-weight:700;color:var(--blue);font-family:'JetBrains Mono',monospace}
+  .counter-item .lbl{font-size:.68rem;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+
+  .empty-state{text-align:center;padding:40px;color:var(--gray)}
+  .empty-state span{font-size:2.5rem;display:block;margin-bottom:8px}
+
+  #toast{position:fixed;bottom:28px;right:28px;background:var(--green);color:#fff;padding:13px 20px;border-radius:10px;font-weight:600;font-size:.88rem;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;z-index:999}
+  #toast.show{opacity:1;transform:translateY(0)}
+
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}
+  .overlay.open{opacity:1;pointer-events:all}
+  .modal{background:#fff;border-radius:var(--radius);max-width:700px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(24px);transition:transform .25s;padding:32px}
+  .overlay.open .modal{transform:translateY(0)}
+
+  .modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}
+  .modal-header h2{font-size:1.2rem;font-weight:700;color:var(--navy);line-height:1.3}
+  .modal-header .modal-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .modal-close{background:none;border:none;cursor:pointer;font-size:1.4rem;color:var(--gray);line-height:1;transition:color .2s;flex-shrink:0;margin-left:12px}
+  .modal-close:hover{color:var(--red)}
+
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px}
+  @media(max-width:500px){.detail-grid{grid-template-columns:1fr}}
+  .detail-item .dlbl{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:4px}
+  .detail-item .dval{font-size:.95rem;color:var(--navy);font-weight:600}
+  .detail-item .dval.mono{font-family:'JetBrains Mono',monospace;font-size:.88rem}
+  .detail-item .dval.empty{color:var(--light);font-weight:400;font-style:italic}
+
+  .people-list-view{display:grid;gap:8px}
+  .person-chip{display:flex;align-items:center;gap:10px;background:var(--ice);border-radius:8px;padding:8px 13px}
+  .person-chip .pnum{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .person-chip .pname{font-size:.88rem;color:var(--navy);font-weight:600}
+
+  .modal-obs{background:var(--white);border-radius:8px;padding:12px 15px;font-size:.88rem;color:var(--navy);border:1.5px solid var(--ice)}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;border-top:1.5px solid var(--ice);padding-top:18px;margin-top:20px}
+
+  /* ALERTA IDOSO NO MODAL */
+  .modal-alerta-idoso{background:#fff0f0;border:2px solid var(--red);border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start}
+  .modal-alerta-idoso .mai{font-size:1.5rem;flex-shrink:0}
+  .modal-alerta-idoso p{font-size:.85rem;font-weight:600;color:#8b0000;line-height:1.55}
+  .modal-alerta-idoso strong{display:block;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:3px}
+
+  /* ENCOMENDAS */
+  .enc-search{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:16px;align-items:end}
+  .enc-list{display:grid;gap:10px}
+  .enc-card{background:var(--white);border:1.5px solid var(--ice);border-radius:10px;padding:14px 18px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:14px}
+  .enc-card.pendente{border-left:4px solid var(--accent)}
+  .enc-card.entregue{border-left:4px solid var(--sky);opacity:.7}
+  .enc-nome{font-weight:700;color:var(--navy);font-size:.95rem}
+  .enc-meta{font-size:.78rem;color:var(--gray);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+  .enc-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+  .status-badge{font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em}
+  .status-badge.pendente{background:#fff8e1;color:#b45309;border:1px solid #f0a500}
+  .status-badge.entregue{background:var(--ice);color:var(--blue);border:1px solid var(--light)}
+  .btn-sm{font-family:'Sora',sans-serif;font-size:.78rem;font-weight:600;padding:6px 12px;border-radius:6px;border:none;cursor:pointer;transition:all .2s}
+  .btn-sm-green{background:var(--blue);color:#fff}
+  .btn-sm-green:hover{background:var(--navy)}
+  .btn-sm-red{background:none;border:1.5px solid #ffcdd2;color:var(--red)}
+  .btn-sm-red:hover{background:#fff0f0}
+  .enc-form{background:var(--ice);border-radius:10px;padding:20px;margin-bottom:20px}
+  .enc-form .grid-3{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:640px){.enc-form .grid-3{grid-template-columns:1fr}}
+
+  /* LOCAÇÃO */
+  .loc-list{display:grid;gap:10px}
+  .loc-card{background:var(--white);border:1.5px solid var(--ice);border-radius:10px;padding:14px 18px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:14px}
+  .loc-card.ativa{border-left:4px solid var(--sky)}
+  .loc-card.encerrada{border-left:4px solid var(--light);opacity:.65}
+  .loc-nome{font-weight:700;color:var(--navy);font-size:.95rem}
+  .loc-meta{font-size:.78rem;color:var(--gray);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+  .loc-form{background:var(--ice);border-radius:10px;padding:20px;margin-bottom:20px}
+
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  /* SUB-TABS */
+  .sub-tabs{display:flex;gap:4px;border-bottom:2px solid var(--ice);margin-bottom:0;margin-top:20px}
+  .sub-tab{font-family:'Sora',sans-serif;font-size:.82rem;font-weight:600;padding:8px 18px;border:none;background:none;cursor:pointer;color:var(--gray);border-radius:8px 8px 0 0;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-2px}
+  .sub-tab:hover{color:var(--blue);background:var(--ice)}
+  .sub-tab.active{color:var(--blue);border-bottom:2px solid var(--blue);background:var(--ice)}
+  .sub-panel{display:none;padding-top:4px}
+  .sub-panel.active{display:block}
+
+  /* OCORRÊNCIAS */
+  .occ-form{background:var(--ice);border-radius:10px;padding:20px;margin-bottom:20px}
+  .occ-card{background:var(--white);border:1.5px solid var(--ice);border-radius:10px;padding:16px 18px;margin-bottom:10px}
+  .occ-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+  .occ-tipo-badge{font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--ice);color:var(--blue)}
+  .occ-data{font-size:.75rem;color:var(--gray);font-family:'JetBrains Mono',monospace}
+  .occ-unidade{font-size:.75rem;font-weight:600;color:var(--blue);background:var(--ice);padding:2px 8px;border-radius:99px}
+  .occ-texto{font-size:.88rem;color:var(--navy);line-height:1.6;white-space:pre-wrap}
+  .occ-actions-row{display:flex;justify-content:flex-end;margin-top:10px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🏢</div>
+    <div class="login-badge">Jardim Paulista</div>
+    <h2>Acesso Restrito</h2>
+    <p>Digite suas credenciais para acessar o sistema</p>
+    <div class="login-field">
+      <label>Usuário</label>
+      <input type="text" id="login-user" placeholder="Digite o usuário" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input type="password" id="login-pass" placeholder="Digite a senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')fazerLogin()">
+    </div>
+    <button class="login-btn" onclick="fazerLogin()">🔓 Entrar</button>
+    <div class="login-error" id="login-error">❌ Usuário ou senha incorretos. Tente novamente.</div>
+    <div class="login-footer">Sistema de Portaria · Jardim Paulista</div>
+  </div>
+</div>
+
+<!-- APP CONTENT -->
+<div id="app-content">
+
+<header>
+  <div class="badge">🏢 Jardim Paulista</div>
+  <h1>Cadastro de Moradores</h1>
+  <p>Gestão completa de unidades, moradores e serviços</p>
+  <div style="margin-top:10px">
+    <button onclick="logout()" style="font-family:'Sora',sans-serif;font-size:.75rem;font-weight:600;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:6px;padding:5px 14px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">🚪 Sair</button>
+  </div>
+</header>
+
+<div class="tabs-nav">
+  <button class="tab-btn active"  onclick="switchTab('cadastro',this)">✏️ Cadastro</button>
+  <button class="tab-btn"         onclick="switchTab('cadastrados',this)">🏠 Cadastrados</button>
+  <button class="tab-btn"         onclick="switchTab('encomendas',this)">📦 Encomendas</button>
+  <button class="tab-btn"         onclick="switchTab('locacao',this)">🚗 Locação Diária</button>
+  <button class="tab-btn"         onclick="switchTab('locmensal',this)">📅 Locação Mensal</button>
+  <button class="tab-btn"         onclick="switchTab('ocorrencias',this)">📋 Ocorrências</button>
+</div>
+
+<!-- ═══ ABA CADASTRO ═══ -->
+<div class="tab-panel active" id="tab-cadastro">
+<div class="card">
+
+  <div class="section-title"><div class="dot"></div>Dados do Morador Principal</div>
+  <div class="grid grid-2" style="margin-bottom:22px">
+    <div class="field span-2">
+      <label>Nome Completo <span class="req">*</span></label>
+      <input type="text" id="nome" placeholder="Ex.: Maria da Silva Santos">
+    </div>
+    <div class="field">
+      <label>CPF <span class="req">*</span></label>
+      <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
+      <span class="hint">Formato: 000.000.000-00</span>
+    </div>
+    <div class="field">
+      <label>Telefone <span class="req">*</span></label>
+      <input type="text" id="telefone" placeholder="(11) 99999-8888" maxlength="15">
+    </div>
+    <div class="field">
+      <label>E-mail</label>
+      <input type="email" id="email" placeholder="email@exemplo.com">
+    </div>
+    <div class="field">
+      <label>Data de Aniversário</label>
+      <input type="date" id="aniversario" onchange="verificarIdoso()">
+    </div>
+    <!-- ALERTA IDOSO -->
+    <div class="alerta-idoso span-2" id="alerta-idoso">
+      <div class="alerta-ico">🚨</div>
+      <div class="alerta-txt">
+        <div class="alerta-titulo">⚠️ Atenção — Estatuto do Idoso</div>
+        Essa pessoa possui direitos exclusivos do Estatuto do Idoso. Qualquer necessidade deve ser respondida imediatamente e com preferência.
+      </div>
+    </div>
+    <div class="field">
+      <label>Data de Cadastro</label>
+      <input type="date" id="data">
+    </div>
+  </div>
+
+  <div class="section-title mt"><div class="dot"></div>Dados da Unidade</div>
+  <div class="grid grid-3" style="margin-bottom:22px">
+    <div class="field">
+      <label>Bloco <span class="req">*</span></label>
+      <input type="text" id="bloco" placeholder="A" maxlength="3" style="text-transform:uppercase">
+    </div>
+    <div class="field">
+      <label>Unidade (Apto) <span class="req">*</span></label>
+      <input type="text" id="unidade" placeholder="101">
+    </div>
+    <div class="field">
+      <label>Vaga(s) Garagem</label>
+      <input type="text" id="vaga" placeholder="15 / 15-16">
+    </div>
+  </div>
+
+  <div class="section-title mt"><div class="dot"></div>Outros Moradores da Unidade</div>
+  <div id="moradores-wrap" class="people-wrap" style="margin-bottom:8px"></div>
+  <button class="btn-add" onclick="addPessoa('moradores-wrap','mor')">＋ Adicionar morador</button>
+
+  <div class="section-title mt" style="margin-top:26px"><div class="dot"></div>Visitantes Autorizados</div>
+  <div id="visitantes-wrap" class="people-wrap" style="margin-bottom:8px"></div>
+  <button class="btn-add" onclick="addPessoa('visitantes-wrap','vis')">＋ Adicionar visitante</button>
+
+  <div class="field" style="margin-top:26px">
+    <label>Observações</label>
+    <textarea id="obs" placeholder="PCD, pet autorizado, autorização especial, restrições…"></textarea>
+  </div>
+
+  <div class="actions" style="margin-top:24px">
+    <button class="btn btn-outline" onclick="limpar()">Limpar</button>
+    <button class="btn btn-primary" onclick="salvar()">✓ Salvar Registro</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══ ABA CADASTRADOS ═══ -->
+<div class="tab-panel" id="tab-cadastrados">
+<div class="card">
+  <div class="counter-bar">
+    <div class="counter-item"><span class="num" id="cnt-total">0</span><span class="lbl">Total</span></div>
+    <div class="counter-item"><span class="num" id="cnt-vagas">0</span><span class="lbl">Com vaga</span></div>
+    <div class="counter-item"><span class="num" id="cnt-mor">0</span><span class="lbl">Com moradores</span></div>
+    <div class="counter-item"><span class="num" id="cnt-idoso">0</span><span class="lbl">Idosos</span></div>
+  </div>
+  <div class="search-bar">
+    <span class="ico">🔍</span>
+    <input type="text" id="busca" placeholder="Pesquisar por nome, CPF ou unidade (ex: A101)…" oninput="renderLista()">
+  </div>
+  <div id="lista-cadastrados"></div>
+  <div class="actions" style="margin-top:20px">
+    <button class="btn btn-export" onclick="exportarCSV()">⬇ Exportar CSV</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══ ABA ENCOMENDAS ═══ -->
+<div class="tab-panel" id="tab-encomendas">
+<div class="card">
+  <div class="section-title"><div class="dot"></div>Registrar Encomenda / Pedido</div>
+  <div class="enc-form">
+    <div class="grid grid-3" style="margin-bottom:14px">
+      <div class="field">
+        <label>Unidade (Bloco + Apto) <span class="req">*</span></label>
+        <input type="text" id="enc-unidade" placeholder="Ex: A101" style="text-transform:uppercase" oninput="sugerirMorador()">
+      </div>
+      <div class="field">
+        <label>Morador</label>
+        <input type="text" id="enc-morador" placeholder="Preenchido automaticamente" readonly style="background:#eee;cursor:default">
+      </div>
+      <div class="field">
+        <label>Tipo</label>
+        <select id="enc-tipo">
+          <option value="Encomenda">📦 Encomenda</option>
+          <option value="Delivery">🛵 Delivery</option>
+          <option value="Correios">📮 Correios</option>
+          <option value="Outro">📋 Outro</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:14px">
+      <div class="field">
+        <label>Descrição / Remetente</label>
+        <input type="text" id="enc-desc" placeholder="Ex: Caixa Amazon, iFood, Sedex...">
+      </div>
+      <div class="field">
+        <label>Data / Hora de Chegada</label>
+        <input type="datetime-local" id="enc-data">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="salvarEncomenda()">📦 Registrar</button>
+    </div>
+  </div>
+
+  <!-- SUB-ABAS ENCOMENDAS -->
+  <div class="sub-tabs">
+    <button class="sub-tab active" onclick="switchSubTab('enc-pendentes',this)">⏳ Pendentes</button>
+    <button class="sub-tab" onclick="switchSubTab('enc-entregues',this)">✅ Entregues</button>
+    <button class="sub-tab" onclick="switchSubTab('enc-historico',this)">📜 Histórico</button>
+  </div>
+
+  <div class="sub-panel active" id="enc-pendentes">
+    <div class="search-bar" style="margin:14px 0 10px">
+      <span class="ico">🔍</span>
+      <input type="text" id="enc-busca-pend" placeholder="Buscar por unidade ou morador…" oninput="renderEncomendas()">
+    </div>
+    <div id="lista-enc-pendentes"></div>
+  </div>
+
+  <div class="sub-panel" id="enc-entregues">
+    <div class="search-bar" style="margin:14px 0 10px">
+      <span class="ico">🔍</span>
+      <input type="text" id="enc-busca-entr" placeholder="Buscar…" oninput="renderEncomendas()">
+    </div>
+    <div id="lista-enc-entregues"></div>
+  </div>
+
+  <div class="sub-panel" id="enc-historico">
+    <div class="search-bar" style="margin:14px 0 10px">
+      <span class="ico">🔍</span>
+      <input type="text" id="enc-busca-hist" placeholder="Buscar no histórico…" oninput="renderEncomendas()">
+    </div>
+    <div id="lista-enc-historico"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ ABA LOCAÇÃO DE VAGAS ═══ -->
+<div class="tab-panel" id="tab-locacao">
+<div class="card">
+  <div class="section-title"><div class="dot"></div>Registrar Locação de Vaga</div>
+  <div class="loc-form">
+    <div class="grid grid-3" style="margin-bottom:14px">
+      <div class="field">
+        <label>Número da Vaga <span class="req">*</span></label>
+        <input type="text" id="loc-vaga" placeholder="Ex: 15">
+      </div>
+      <div class="field">
+        <label>Locatário (Morador) <span class="req">*</span></label>
+        <input type="text" id="loc-morador" placeholder="Nome ou unidade">
+      </div>
+      <div class="field">
+        <label>Quantidade de Diárias <span class="req">*</span></label>
+        <input type="number" id="loc-diarias" placeholder="Ex: 30" min="1">
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:14px">
+      <div class="field">
+        <label>Data de Início <span class="req">*</span></label>
+        <input type="date" id="loc-inicio">
+      </div>
+      <div class="field">
+        <label>Data de Término (calculada)</label>
+        <input type="text" id="loc-fim" readonly placeholder="Calculado automaticamente" style="background:#eee;cursor:default">
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:14px">
+      <label>Observações</label>
+      <input type="text" id="loc-obs" placeholder="Informações adicionais sobre a locação">
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="salvarLocacao()">🚗 Registrar Locação</button>
+    </div>
+  </div>
+
+  <div class="section-title"><div class="dot"></div>Locações Registradas</div>
+  <div class="search-bar">
+    <span class="ico">🔍</span>
+    <input type="text" id="loc-busca" placeholder="Buscar por vaga ou morador…" oninput="renderLocacoes()">
+  </div>
+  <div id="lista-locacoes"></div>
+</div>
+</div>
+
+<!-- ═══ ABA LOCAÇÃO MENSAL ═══ -->
+<div class="tab-panel" id="tab-locmensal">
+<div class="card">
+  <div class="section-title"><div class="dot"></div>Registrar Locação Mensal de Vaga</div>
+  <div class="loc-form">
+    <div class="grid grid-3" style="margin-bottom:14px">
+      <div class="field">
+        <label>Número da Vaga <span class="req">*</span></label>
+        <input type="text" id="locm-vaga" placeholder="Ex: 15">
+      </div>
+      <div class="field">
+        <label>Locatário (Morador) <span class="req">*</span></label>
+        <input type="text" id="locm-morador" placeholder="Nome ou unidade">
+      </div>
+      <div class="field">
+        <label>Valor Mensal (R$)</label>
+        <input type="text" id="locm-valor" placeholder="Ex: 150,00">
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:14px">
+      <div class="field">
+        <label>Data de Início <span class="req">*</span></label>
+        <input type="date" id="locm-inicio">
+      </div>
+      <div class="field">
+        <label>Vencimento (dia do mês)</label>
+        <input type="number" id="locm-venc" placeholder="Ex: 5" min="1" max="31">
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:14px">
+      <label>Observações</label>
+      <input type="text" id="locm-obs" placeholder="Informações adicionais">
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="salvarLocMensal()">📅 Registrar Locação Mensal</button>
+    </div>
+  </div>
+  <div class="section-title"><div class="dot"></div>Locações Mensais Ativas</div>
+  <div class="search-bar">
+    <span class="ico">🔍</span>
+    <input type="text" id="locm-busca" placeholder="Buscar por vaga ou morador…" oninput="renderLocMensal()">
+  </div>
+  <div id="lista-locmensal"></div>
+</div>
+</div>
+
+<!-- ═══ ABA OCORRÊNCIAS ═══ -->
+<div class="tab-panel" id="tab-ocorrencias">
+<div class="card">
+  <div class="section-title"><div class="dot"></div>Registrar Ocorrência</div>
+  <div class="occ-form">
+    <div class="grid grid-2" style="margin-bottom:14px">
+      <div class="field">
+        <label>Tipo de Ocorrência</label>
+        <select id="occ-tipo">
+          <option>🔔 Geral</option>
+          <option>🚨 Segurança</option>
+          <option>🔧 Manutenção</option>
+          <option>🚗 Veículo</option>
+          <option>👥 Conflito entre moradores</option>
+          <option>📦 Entrega / Encomenda</option>
+          <option>🐾 Animal</option>
+          <option>📋 Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Unidade Envolvida</label>
+        <input type="text" id="occ-unidade" placeholder="Ex: A101 (opcional)">
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:14px">
+      <label>Descrição da Ocorrência <span class="req">*</span></label>
+      <textarea id="occ-texto" placeholder="Descreva detalhadamente o que ocorreu, horário, pessoas envolvidas, providências tomadas…" style="min-height:120px"></textarea>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="salvarOcorrencia()">📋 Salvar Ocorrência</button>
+    </div>
+  </div>
+  <div class="section-title mt"><div class="dot"></div>Ocorrências Registradas</div>
+  <div class="search-bar">
+    <span class="ico">🔍</span>
+    <input type="text" id="occ-busca" placeholder="Buscar por tipo, unidade ou texto…" oninput="renderOcorrencias()">
+  </div>
+  <div id="lista-ocorrencias"></div>
+</div>
+</div>
+
+<!-- ═══ MODAL DETALHES ═══ -->
+<div class="overlay" id="overlay" onclick="fecharModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h2 id="modal-nome">—</h2>
+        <div class="modal-badges" id="modal-badges"></div>
+      </div>
+      <button class="modal-close" onclick="fecharModalBtn()">✕</button>
+    </div>
+
+    <div id="modal-alerta-idoso-wrap"></div>
+
+    <div class="section-title"><div class="dot"></div>Dados Pessoais</div>
+    <div class="detail-grid" id="modal-pessoal"></div>
+
+    <div class="section-title mt"><div class="dot"></div>Unidade</div>
+    <div class="detail-grid" id="modal-unidade"></div>
+
+    <div id="modal-moradores-sec">
+      <div class="section-title mt"><div class="dot"></div>Moradores da Unidade</div>
+      <div id="modal-moradores" class="people-list-view"></div>
+    </div>
+
+    <div id="modal-visitantes-sec">
+      <div class="section-title mt"><div class="dot"></div>Visitantes Autorizados</div>
+      <div id="modal-visitantes" class="people-list-view"></div>
+    </div>
+
+    <div id="modal-obs-sec">
+      <div class="section-title mt"><div class="dot"></div>Observações</div>
+      <div class="modal-obs" id="modal-obs"></div>
+    </div>
+
+    <div class="modal-actions">
+      <div id="modal-wpp-btn"></div>
+      <button class="btn btn-danger" id="modal-excluir">🗑 Excluir</button>
+      <button class="btn btn-outline" onclick="fecharModalBtn()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+let registros   = JSON.parse(localStorage.getItem('portaria_dados')    || '[]');
+let encomendas  = JSON.parse(localStorage.getItem('portaria_enc')      || '[]');
+let locacoes    = JSON.parse(localStorage.getItem('portaria_loc')      || '[]');
+let locMensais  = JSON.parse(localStorage.getItem('portaria_locm')     || '[]');
+let ocorrencias = JSON.parse(localStorage.getItem('portaria_occ')      || '[]');
+let modalId = null;
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+document.getElementById('data').value = hj();
+const agora = new Date(); agora.setMinutes(agora.getMinutes()-agora.getTimezoneOffset());
+document.getElementById('enc-data').value = agora.toISOString().slice(0,16);
+document.getElementById('loc-inicio').value = hj();
+document.getElementById('locm-inicio').value = hj();
+
+addPessoa('moradores-wrap','mor');
+addPessoa('visitantes-wrap','vis');
+renderLista(); renderEncomendas(); renderLocacoes(); renderLocMensal(); renderOcorrencias(); atualizarContadores();
+
+// auto-calc data fim locação
+document.getElementById('loc-inicio').addEventListener('change', calcFimLocacao);
+document.getElementById('loc-diarias').addEventListener('input', calcFimLocacao);
+
+function hj(){ return new Date().toISOString().split('T')[0]; }
+
+// ── MASKS ──────────────────────────────────────────────────────────────────
+document.getElementById('cpf').addEventListener('input', function(){
+  let v=this.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>9) v=v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
+  else if(v.length>6) v=v.replace(/(\d{3})(\d{3})(\d{1,3})/,'$1.$2.$3');
+  else if(v.length>3) v=v.replace(/(\d{3})(\d{1,3})/,'$1.$2');
+  this.value=v;
+});
+document.getElementById('telefone').addEventListener('input', function(){
+  let v=this.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>6) v=v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+  else if(v.length>2) v=v.replace(/(\d{2})(\d{0,5})/,'($1) $2');
+  this.value=v;
+});
+
+// ── TABS ───────────────────────────────────────────────────────────────────
+function switchTab(id, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='cadastrados') { renderLista(); atualizarContadores(); }
+  if(id==='encomendas')  renderEncomendas();
+  if(id==='locacao')     renderLocacoes();
+  if(id==='locmensal')   renderLocMensal();
+  if(id==='ocorrencias') renderOcorrencias();
+}
+
+function switchSubTab(id, btn){
+  const parent = btn.closest('.card');
+  parent.querySelectorAll('.sub-panel').forEach(p=>p.classList.remove('active'));
+  parent.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  renderEncomendas();
+}
+
+// ── IDOSO ──────────────────────────────────────────────────────────────────
+function calcIdade(aniv){
+  if(!aniv) return null;
+  const [y,m,d]=aniv.split('-').map(Number);
+  const hoje=new Date();
+  let age=hoje.getFullYear()-y;
+  if(hoje.getMonth()+1<m||(hoje.getMonth()+1===m&&hoje.getDate()<d)) age--;
+  return age;
+}
+function verificarIdoso(){
+  const aniv=document.getElementById('aniversario').value;
+  const alerta=document.getElementById('alerta-idoso');
+  const idade=calcIdade(aniv);
+  if(idade!==null && idade>=60) alerta.classList.add('visivel');
+  else alerta.classList.remove('visivel');
+}
+
+// ── PEOPLE ROWS ────────────────────────────────────────────────────────────
+function addPessoa(wrapId, prefix){
+  const wrap=document.getElementById(wrapId);
+  const idx=wrap.children.length+1;
+  const uid=prefix+'_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+  const div=document.createElement('div');
+  div.className='people-row'; div.dataset.uid=uid;
+  div.innerHTML=`<div class="people-num">${idx}</div>
+    <input type="text" placeholder="${prefix==='mor'?'Nome do morador':'Nome do visitante'} ${idx}">
+    <button class="btn-remove" onclick="removePessoa('${wrapId}','${uid}')" title="Remover">✕</button>`;
+  wrap.appendChild(div);
+}
+function removePessoa(wrapId,uid){
+  const wrap=document.getElementById(wrapId);
+  wrap.querySelector(`[data-uid="${uid}"]`)?.remove();
+  wrap.querySelectorAll('.people-num').forEach((el,i)=>el.textContent=i+1);
+}
+function getPeopleValues(wrapId){
+  return Array.from(document.querySelectorAll(`#${wrapId} input`)).map(i=>i.value.trim()).filter(Boolean);
+}
+
+// ── SALVAR CADASTRO ────────────────────────────────────────────────────────
+function salvar(){
+  const nome=document.getElementById('nome').value.trim();
+  const cpf=document.getElementById('cpf').value.trim();
+  const tel=document.getElementById('telefone').value.trim();
+  const bloc=document.getElementById('bloco').value.trim().toUpperCase();
+  const unid=document.getElementById('unidade').value.trim();
+  ['nome','cpf','telefone','bloco','unidade'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('error',![nome,cpf,tel,bloc,unid][i]);
+  });
+  if(!nome||!cpf||!tel||!bloc||!unid){shake(document.querySelector('.btn-primary'));return;}
+  const aniv=document.getElementById('aniversario').value;
+  registros.push({
+    id:Date.now(), nome, cpf, tel,
+    email:document.getElementById('email').value.trim(),
+    aniversario:aniv,
+    idoso: calcIdade(aniv)!==null && calcIdade(aniv)>=60,
+    bloco:bloc, unidade:unid,
+    vaga:document.getElementById('vaga').value.trim(),
+    moradores:getPeopleValues('moradores-wrap'),
+    visitantes:getPeopleValues('visitantes-wrap'),
+    obs:document.getElementById('obs').value.trim(),
+    data:document.getElementById('data').value,
+  });
+  salvarLocal(); limpar();
+  showToast('✓ Cadastro salvo com sucesso!');
+}
+function salvarLocal(){
+  localStorage.setItem('portaria_dados',JSON.stringify(registros));
+  atualizarContadores();
+}
+function limpar(){
+  ['nome','cpf','telefone','email','bloco','unidade','vaga','obs'].forEach(id=>{
+    const el=document.getElementById(id); if(el){el.value='';el.classList.remove('error');}
+  });
+  document.getElementById('aniversario').value='';
+  document.getElementById('alerta-idoso').classList.remove('visivel');
+  document.getElementById('data').value=hj();
+  document.getElementById('moradores-wrap').innerHTML='';
+  document.getElementById('visitantes-wrap').innerHTML='';
+  addPessoa('moradores-wrap','mor');
+  addPessoa('visitantes-wrap','vis');
+}
+
+// ── RENDER LISTA CADASTRADOS ───────────────────────────────────────────────
+function renderLista(){
+  const q=(document.getElementById('busca')?.value||'').toLowerCase().trim();
+  const cont=document.getElementById('lista-cadastrados');
+  if(!cont) return;
+  let lista=registros;
+  if(q){
+    lista=registros.filter(r=>{
+      const uk=(r.bloco+r.unidade).toLowerCase().replace(/\s/g,'');
+      return r.nome.toLowerCase().includes(q)
+        ||r.cpf.replace(/\D/g,'').includes(q.replace(/\D/g,''))
+        ||uk.includes(q.replace(/\s/g,''))
+        ||r.bloco.toLowerCase().includes(q)
+        ||r.unidade.toLowerCase().includes(q);
+    });
+  }
+  if(!lista.length){
+    cont.innerHTML=`<div class="empty-state"><span>${q?'🔎':'📋'}</span>${q?'Nenhum resultado.':'Nenhum cadastro ainda.<br>Use a aba <strong>✏️ Cadastro</strong>.'}</div>`;
+    return;
+  }
+  cont.innerHTML=`<div class="list-grid">${lista.map(r=>{
+    const mors=r.moradores?.filter(Boolean)||[];
+    const vis=r.visitantes?.filter(Boolean)||[];
+    const idade=calcIdade(r.aniversario);
+    return `<div class="cond-card${r.idoso?' idoso':''}" onclick="abrirModal(${r.id})">
+      <div>
+        <div class="cond-name">${r.nome}</div>
+        <div class="cond-meta">
+          <span>🏢 Bloco <strong>${r.bloco}</strong> · Unid. <strong>${r.unidade}</strong></span>
+          ${r.vaga?`<span>🚗 Vaga ${r.vaga}</span>`:''}
+          ${mors.length?`<span>👥 ${mors.length} morador${mors.length>1?'es':''}</span>`:''}
+          ${vis.length?`<span>🚶 ${vis.length} visitante${vis.length>1?'s':''}</span>`:''}
+          ${r.idoso?`<span class="idoso-badge">🔴 Idoso · ${idade} anos</span>`:''}
+        </div>
+        ${mors.length?`<div style="margin-top:7px;display:flex;flex-wrap:wrap;gap:5px">${mors.map(m=>`<span class="tag">👤 ${m}</span>`).join('')}</div>`:''}
+      </div>
+      <div class="arrow">›</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ── MODAL ──────────────────────────────────────────────────────────────────
+function abrirModal(id){
+  const r=registros.find(x=>x.id===id);
+  if(!r) return;
+  modalId=id;
+
+  document.getElementById('modal-nome').textContent=r.nome;
+
+  // Badges
+  const badges=document.getElementById('modal-badges');
+  const idade=calcIdade(r.aniversario);
+  badges.innerHTML=`<span class="tag">🏢 ${r.bloco}·${r.unidade}</span>`
+    +(r.idoso?`<span class="idoso-badge">🔴 Idoso · ${idade} anos</span>`:'');
+
+  // Alerta idoso
+  const alertaWrap=document.getElementById('modal-alerta-idoso-wrap');
+  alertaWrap.innerHTML=r.idoso?`<div class="modal-alerta-idoso">
+    <div class="mai">🚨</div>
+    <p><strong>⚠️ Atenção — Estatuto do Idoso</strong>
+    Essa pessoa possui direitos exclusivos do Estatuto do Idoso. Qualquer necessidade deve ser respondida imediatamente e com preferência.</p>
+  </div>`:'';
+
+  // Pessoal
+  const dtAniv=r.aniversario?r.aniversario.split('-').reverse().join('/'):'';
+  document.getElementById('modal-pessoal').innerHTML=
+    dItem('CPF',r.cpf,true)+dItem('Telefone',r.tel)+dItem('E-mail',r.email)+
+    dItem('Data de Aniversário',dtAniv?`${dtAniv}${idade!==null?' ('+idade+' anos)':''}`:'');
+
+  // Unidade
+  document.getElementById('modal-unidade').innerHTML=
+    dItem('Bloco',r.bloco)+dItem('Unidade',r.unidade)+
+    dItem('Vaga(s) Garagem',r.vaga)+dItem('Cadastrado em',r.data?r.data.split('-').reverse().join('/'):null);
+
+  // Moradores
+  const mors=r.moradores?.filter(Boolean)||[];
+  const morSec=document.getElementById('modal-moradores-sec');
+  if(mors.length){
+    morSec.style.display='';
+    document.getElementById('modal-moradores').innerHTML=mors.map((m,i)=>`<div class="person-chip"><div class="pnum">${i+1}</div><div class="pname">${m}</div></div>`).join('');
+  } else morSec.style.display='none';
+
+  // Visitantes
+  const vis=r.visitantes?.filter(Boolean)||[];
+  const visSec=document.getElementById('modal-visitantes-sec');
+  if(vis.length){
+    visSec.style.display='';
+    document.getElementById('modal-visitantes').innerHTML=vis.map((v,i)=>`<div class="person-chip"><div class="pnum">${i+1}</div><div class="pname">${v}</div></div>`).join('');
+  } else visSec.style.display='none';
+
+  // Obs
+  const obsSec=document.getElementById('modal-obs-sec');
+  if(r.obs){obsSec.style.display='';document.getElementById('modal-obs').textContent=r.obs;}
+  else obsSec.style.display='none';
+
+  // WhatsApp
+  const wppBtn=document.getElementById('modal-wpp-btn');
+  if(r.tel){
+    const num=r.tel.replace(/\D/g,'');
+    const wppNum=num.length===11?'55'+num:num;
+    wppBtn.innerHTML=`<a class="btn-wpp" href="https://wa.me/${wppNum}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>`;
+  } else wppBtn.innerHTML='';
+
+  document.getElementById('modal-excluir').onclick=()=>excluir(id);
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function dItem(label,val,mono=false){
+  const empty=!val;
+  return `<div class="detail-item"><div class="dlbl">${label}</div><div class="dval${mono?' mono':''}${empty?' empty':''}">${val||'Não informado'}</div></div>`;
+}
+function fecharModal(e){if(e.target===document.getElementById('overlay'))fecharModalBtn();}
+function fecharModalBtn(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';modalId=null;}
+function excluir(id){
+  if(!confirm('Excluir este cadastro definitivamente?')) return;
+  registros=registros.filter(r=>r.id!==id);
+  salvarLocal(); fecharModalBtn(); renderLista();
+  showToast('🗑 Cadastro excluído.');
+}
+
+// ── CONTADORES ─────────────────────────────────────────────────────────────
+function atualizarContadores(){
+  document.getElementById('cnt-total').textContent=registros.length;
+  document.getElementById('cnt-vagas').textContent=registros.filter(r=>r.vaga).length;
+  document.getElementById('cnt-mor').textContent=registros.filter(r=>r.moradores?.some(Boolean)).length;
+  document.getElementById('cnt-idoso').textContent=registros.filter(r=>r.idoso).length;
+}
+
+// ── ENCOMENDAS ─────────────────────────────────────────────────────────────
+function sugerirMorador(){
+  const input=document.getElementById('enc-unidade').value.replace(/\s/g,'').toUpperCase();
+  if(input.length<2){document.getElementById('enc-morador').value='';return;}
+  const r=registros.find(x=>(x.bloco+x.unidade).replace(/\s/g,'').toUpperCase()===input);
+  document.getElementById('enc-morador').value=r?r.nome:'';
+}
+
+function wppEncNumero(unid){
+  const input=unid.replace(/\s/g,'').toUpperCase();
+  const r=registros.find(x=>(x.bloco+x.unidade).replace(/\s/g,'').toUpperCase()===input);
+  return r?.tel?r.tel.replace(/\D/g,''):'';
+}
+
+function wppAvisarChegada(encId){
+  const enc=encomendas.find(e=>e.id===encId);
+  if(!enc) return;
+  const num=wppEncNumero(enc.unid);
+  if(!num){alert('Telefone não encontrado para esta unidade. Verifique o cadastro.');return;}
+  const wpp='55'+num;
+  const msg=encodeURIComponent('Olá! 👋🏼
+Sua encomenda chegou na portaria e está disponível para retirada.
+Importante: Caso esteja no condomínio, faça a retirada imediatamente. Não estando, retire assim que chegar.
+Obrigado!');
+  window.open('https://wa.me/'+wpp+'?text='+msg,'_blank');
+}
+
+function salvarEncomenda(){
+  const unid=document.getElementById('enc-unidade').value.trim().toUpperCase();
+  const tipo=document.getElementById('enc-tipo').value;
+  const desc=document.getElementById('enc-desc').value.trim();
+  const dataE=document.getElementById('enc-data').value;
+  const morador=document.getElementById('enc-morador').value.trim();
+  if(!unid){document.getElementById('enc-unidade').classList.add('error');shake(document.querySelector('#tab-encomendas .btn-primary'));return;}
+  document.getElementById('enc-unidade').classList.remove('error');
+  const enc={id:Date.now(),unid,morador,tipo,desc,dataChegada:dataE,status:'pendente'};
+  encomendas.push(enc);
+  localStorage.setItem('portaria_enc',JSON.stringify(encomendas));
+  document.getElementById('enc-unidade').value='';
+  document.getElementById('enc-morador').value='';
+  document.getElementById('enc-desc').value='';
+  renderEncomendas();
+  showToast('📦 Encomenda registrada!');
+  // Auto-avisar via WhatsApp se tiver telefone
+  const num=wppEncNumero(unid);
+  if(num){
+    const wpp='55'+num;
+    const msg=encodeURIComponent('Olá! 👋🏼\nSua encomenda chegou na portaria e está disponível para retirada.\nImportante: Caso esteja no condomínio, faça a retirada imediatamente. Não estando, retire assim que chegar.\nObrigado!');
+    setTimeout(()=>{ if(confirm('Avisar o morador via WhatsApp sobre a chegada?')) window.open('https://wa.me/'+wpp+'?text='+msg,'_blank'); },300);
+  }
+}
+
+function entregarEncomenda(id){
+  const enc=encomendas.find(e=>e.id===id);
+  if(!enc) return;
+  const agora=new Date();
+  const hora=agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const dataHora=agora.toLocaleString('pt-BR');
+  enc.status='entregue';
+  enc.dataEntrega=dataHora;
+  localStorage.setItem('portaria_enc',JSON.stringify(encomendas));
+  renderEncomendas();
+  showToast('✓ Entregue ao morador!');
+  // Mensagem de confirmação WhatsApp
+  const num=wppEncNumero(enc.unid);
+  if(num){
+    const wpp='55'+num;
+    const msg=encodeURIComponent('Sua encomenda foi retirada na portaria às '+hora+'\nResponda com um OK para comprovação da retirada\nObrigado!');
+    setTimeout(()=>{ if(confirm('Enviar confirmação de retirada via WhatsApp?')) window.open('https://wa.me/'+wpp+'?text='+msg,'_blank'); },300);
+  }
+}
+
+function excluirEncomenda(id){
+  if(!confirm('Excluir este registro?')) return;
+  encomendas=encomendas.filter(e=>e.id!==id);
+  localStorage.setItem('portaria_enc',JSON.stringify(encomendas));
+  renderEncomendas();
+}
+
+function renderEncomendas(){
+  const qP=(document.getElementById('enc-busca-pend')?.value||'').toLowerCase();
+  const qE=(document.getElementById('enc-busca-entr')?.value||'').toLowerCase();
+  const qH=(document.getElementById('enc-busca-hist')?.value||'').toLowerCase();
+
+  const pendentes=encomendas.filter(e=>e.status==='pendente'&&(!qP||e.unid.toLowerCase().includes(qP)||e.morador.toLowerCase().includes(qP)));
+  const entregues=encomendas.filter(e=>e.status==='entregue'&&(!qE||e.unid.toLowerCase().includes(qE)||e.morador.toLowerCase().includes(qE)));
+  const historico=[...encomendas].filter(e=>!qH||(e.unid.toLowerCase().includes(qH)||e.morador.toLowerCase().includes(qH)||e.desc?.toLowerCase().includes(qH)));
+
+  renderEncLista('lista-enc-pendentes', pendentes, 'pendente');
+  renderEncLista('lista-enc-entregues', entregues, 'entregue');
+  renderEncLista('lista-enc-historico', [...historico].sort((a,b)=>b.id-a.id), 'todos');
+}
+
+function renderEncLista(contId, lista, modo){
+  const cont=document.getElementById(contId);
+  if(!cont) return;
+  if(!lista.length){cont.innerHTML=`<div class="empty-state"><span>📦</span>Nenhuma encomenda aqui.</div>`;return;}
+  cont.innerHTML=`<div class="enc-list">${lista.map(e=>{
+    const dt=e.dataChegada?new Date(e.dataChegada).toLocaleString('pt-BR'):'—';
+    const ico={Encomenda:'📦',Delivery:'🛵',Correios:'📮',Outro:'📋'}[e.tipo]||'📦';
+    const temTel=!!wppEncNumero(e.unid);
+    return `<div class="enc-card ${e.status}">
+      <div>
+        <div class="enc-nome">${ico} ${e.unid}${e.morador?' — '+e.morador:''}</div>
+        <div class="enc-meta">
+          <span>${e.tipo}</span>
+          ${e.desc?`<span>${e.desc}</span>`:''}
+          <span>🕐 Chegou: ${dt}</span>
+          ${e.status==='entregue'?`<span>✅ Retirado: ${e.dataEntrega||''}</span>`:''}
+        </div>
+      </div>
+      <div class="enc-actions">
+        <span class="status-badge ${e.status}">${e.status==='pendente'?'Aguardando':'Entregue'}</span>
+        ${temTel?`<button class="btn-wpp" style="padding:6px 10px;font-size:.75rem" onclick="wppAvisarChegada(${e.id})" title="Avisar via WhatsApp"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;fill:#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>`:''}
+        ${e.status==='pendente'?`<button class="btn-sm btn-sm-green" onclick="entregarEncomenda(${e.id})">✓ Entregar</button>`:''}
+        <button class="btn-sm btn-sm-red" onclick="excluirEncomenda(${e.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ── LOCAÇÃO DE VAGAS ───────────────────────────────────────────────────────
+function calcFimLocacao(){
+  const inicio=document.getElementById('loc-inicio').value;
+  const dias=parseInt(document.getElementById('loc-diarias').value)||0;
+  const el=document.getElementById('loc-fim');
+  if(inicio&&dias>0){
+    const fim=new Date(inicio+'T00:00:00');
+    // 1 diária = mesmo dia; 2 diárias = dia seguinte; etc.
+    fim.setDate(fim.getDate()+(dias-1));
+    el.value=fim.toLocaleDateString('pt-BR');
+  } else el.value='';
+}
+
+function salvarLocacao(){
+  const vaga=document.getElementById('loc-vaga').value.trim();
+  const morador=document.getElementById('loc-morador').value.trim();
+  const diarias=parseInt(document.getElementById('loc-diarias').value)||0;
+  const inicio=document.getElementById('loc-inicio').value;
+  if(!vaga||!morador||!diarias||!inicio){
+    ['loc-vaga','loc-morador','loc-diarias','loc-inicio'].forEach(id=>{
+      document.getElementById(id).classList.toggle('error',!document.getElementById(id).value.trim());
+    });
+    return;
+  }
+  ['loc-vaga','loc-morador','loc-diarias','loc-inicio'].forEach(id=>document.getElementById(id).classList.remove('error'));
+  const fim=new Date(inicio+'T00:00:00');
+  fim.setDate(fim.getDate()+diarias-1);
+  locacoes.push({
+    id:Date.now(), vaga, morador, diarias, inicio,
+    fim:fim.toISOString().split('T')[0],
+    obs:document.getElementById('loc-obs').value.trim(),
+    status:'ativa'
+  });
+  localStorage.setItem('portaria_loc',JSON.stringify(locacoes));
+  document.getElementById('loc-vaga').value='';
+  document.getElementById('loc-morador').value='';
+  document.getElementById('loc-diarias').value='';
+  document.getElementById('loc-obs').value='';
+  document.getElementById('loc-fim').value='';
+  renderLocacoes();
+  showToast('🚗 Locação registrada!');
+}
+
+function encerrarLocacao(id){
+  const loc=locacoes.find(l=>l.id===id);
+  if(loc) loc.status='encerrada';
+  localStorage.setItem('portaria_loc',JSON.stringify(locacoes));
+  renderLocacoes();
+  showToast('✓ Locação encerrada.');
+}
+function excluirLocacao(id){
+  if(!confirm('Excluir este registro de locação?')) return;
+  locacoes=locacoes.filter(l=>l.id!==id);
+  localStorage.setItem('portaria_loc',JSON.stringify(locacoes));
+  renderLocacoes();
+}
+
+function renderLocacoes(){
+  const q=(document.getElementById('loc-busca')?.value||'').toLowerCase();
+  const cont=document.getElementById('lista-locacoes');
+  if(!cont) return;
+  let lista=q?locacoes.filter(l=>l.vaga.toLowerCase().includes(q)||l.morador.toLowerCase().includes(q)):locacoes;
+  lista=[...lista].sort((a,b)=>b.id-a.id);
+  if(!lista.length){cont.innerHTML=`<div class="empty-state"><span>🚗</span>Nenhuma locação registrada ainda.</div>`;return;}
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  cont.innerHTML=`<div class="loc-list">${lista.map(l=>{
+    const fimDt=new Date(l.fim+'T00:00:00');
+    const vencida=l.status==='ativa'&&fimDt<hoje;
+    const fimStr=fimDt.toLocaleDateString('pt-BR');
+    const iniStr=new Date(l.inicio+'T00:00:00').toLocaleDateString('pt-BR');
+    return `<div class="loc-card ${l.status}">
+      <div>
+        <div class="loc-nome">🅿️ Vaga ${l.vaga} — ${l.morador}</div>
+        <div class="loc-meta">
+          <span>📅 ${iniStr} → ${fimStr}</span>
+          <span>🗓 ${l.diarias} diária${l.diarias>1?'s':''}</span>
+          ${l.obs?`<span>📝 ${l.obs}</span>`:''}
+          ${vencida?`<span style="color:var(--red);font-weight:700">⚠️ VENCIDA</span>`:''}
+        </div>
+      </div>
+      <div class="enc-actions">
+        <span class="status-badge ${l.status==='ativa'?'pendente':'entregue'}">${l.status==='ativa'?'Ativa':'Encerrada'}</span>
+        ${l.status==='ativa'?`<button class="btn-sm btn-sm-green" onclick="encerrarLocacao(${l.id})">✓ Encerrar</button>`:''}
+        <button class="btn-sm btn-sm-red" onclick="excluirLocacao(${l.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ── EXPORTAR CSV ───────────────────────────────────────────────────────────
+// ── LOCAÇÃO MENSAL ────────────────────────────────────────────────────────
+function salvarLocMensal(){
+  const vaga=document.getElementById('locm-vaga').value.trim();
+  const morador=document.getElementById('locm-morador').value.trim();
+  const inicio=document.getElementById('locm-inicio').value;
+  if(!vaga||!morador||!inicio){
+    ['locm-vaga','locm-morador','locm-inicio'].forEach(id=>{
+      document.getElementById(id).classList.toggle('error',!document.getElementById(id).value.trim());
+    });
+    return;
+  }
+  ['locm-vaga','locm-morador','locm-inicio'].forEach(id=>document.getElementById(id).classList.remove('error'));
+  locMensais.push({
+    id:Date.now(), vaga, morador,
+    valor:document.getElementById('locm-valor').value.trim(),
+    venc:document.getElementById('locm-venc').value.trim(),
+    inicio,
+    obs:document.getElementById('locm-obs').value.trim(),
+    status:'ativa'
+  });
+  localStorage.setItem('portaria_locm',JSON.stringify(locMensais));
+  ['locm-vaga','locm-morador','locm-valor','locm-venc','locm-obs'].forEach(id=>document.getElementById(id).value='');
+  renderLocMensal();
+  showToast('📅 Locação mensal registrada!');
+}
+
+function encerrarLocMensal(id){
+  const l=locMensais.find(x=>x.id===id);
+  if(l) l.status='encerrada';
+  localStorage.setItem('portaria_locm',JSON.stringify(locMensais));
+  renderLocMensal();
+  showToast('✓ Locação mensal encerrada.');
+}
+
+function excluirLocMensal(id){
+  if(!confirm('Excluir este registro?')) return;
+  locMensais=locMensais.filter(l=>l.id!==id);
+  localStorage.setItem('portaria_locm',JSON.stringify(locMensais));
+  renderLocMensal();
+}
+
+function renderLocMensal(){
+  const q=(document.getElementById('locm-busca')?.value||'').toLowerCase();
+  const cont=document.getElementById('lista-locmensal');
+  if(!cont) return;
+  let lista=q?locMensais.filter(l=>l.vaga.toLowerCase().includes(q)||l.morador.toLowerCase().includes(q)):locMensais;
+  lista=[...lista].sort((a,b)=>b.id-a.id);
+  if(!lista.length){cont.innerHTML=`<div class="empty-state"><span>📅</span>Nenhuma locação mensal registrada ainda.</div>`;return;}
+  cont.innerHTML=`<div class="loc-list">${lista.map(l=>{
+    const iniStr=new Date(l.inicio+'T00:00:00').toLocaleDateString('pt-BR');
+    return `<div class="loc-card ${l.status}">
+      <div>
+        <div class="loc-nome">🅿️ Vaga ${l.vaga} — ${l.morador}</div>
+        <div class="loc-meta">
+          <span>📅 Início: ${iniStr}</span>
+          ${l.valor?`<span>💰 R$ ${l.valor}/mês</span>`:''}
+          ${l.venc?`<span>📆 Vence dia ${l.venc}</span>`:''}
+          ${l.obs?`<span>📝 ${l.obs}</span>`:''}
+        </div>
+      </div>
+      <div class="enc-actions">
+        <span class="status-badge ${l.status==='ativa'?'pendente':'entregue'}">${l.status==='ativa'?'Ativa':'Encerrada'}</span>
+        ${l.status==='ativa'?`<button class="btn-sm btn-sm-green" onclick="encerrarLocMensal(${l.id})">✓ Encerrar</button>`:''}
+        <button class="btn-sm btn-sm-red" onclick="excluirLocMensal(${l.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ── OCORRÊNCIAS ────────────────────────────────────────────────────────────
+function salvarOcorrencia(){
+  const texto=document.getElementById('occ-texto').value.trim();
+  if(!texto){document.getElementById('occ-texto').classList.add('error');shake(document.querySelector('#tab-ocorrencias .btn-primary'));return;}
+  document.getElementById('occ-texto').classList.remove('error');
+  const agora=new Date();
+  ocorrencias.push({
+    id:Date.now(),
+    tipo:document.getElementById('occ-tipo').value,
+    unidade:document.getElementById('occ-unidade').value.trim().toUpperCase(),
+    texto,
+    dataISO:agora.toISOString(),
+    dataStr:agora.toLocaleString('pt-BR'),
+    usuario:sessionStorage.getItem('jp_user')||'portaria'
+  });
+  localStorage.setItem('portaria_occ',JSON.stringify(ocorrencias));
+  document.getElementById('occ-texto').value='';
+  document.getElementById('occ-unidade').value='';
+  renderOcorrencias();
+  showToast('📋 Ocorrência registrada!');
+}
+
+function excluirOcorrencia(id){
+  if(!confirm('Excluir esta ocorrência definitivamente?')) return;
+  ocorrencias=ocorrencias.filter(o=>o.id!==id);
+  localStorage.setItem('portaria_occ',JSON.stringify(ocorrencias));
+  renderOcorrencias();
+}
+
+function renderOcorrencias(){
+  const q=(document.getElementById('occ-busca')?.value||'').toLowerCase();
+  const cont=document.getElementById('lista-ocorrencias');
+  if(!cont) return;
+  let lista=q?ocorrencias.filter(o=>o.tipo.toLowerCase().includes(q)||o.texto.toLowerCase().includes(q)||(o.unidade||'').toLowerCase().includes(q)):ocorrencias;
+  lista=[...lista].sort((a,b)=>b.id-a.id);
+  if(!lista.length){cont.innerHTML=`<div class="empty-state"><span>📋</span>Nenhuma ocorrência registrada ainda.</div>`;return;}
+  cont.innerHTML=lista.map(o=>`
+    <div class="occ-card">
+      <div class="occ-card-header">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="occ-tipo-badge">${o.tipo}</span>
+          ${o.unidade?`<span class="occ-unidade">🏢 ${o.unidade}</span>`:''}
+          <span style="font-size:.72rem;color:var(--gray)">por <strong>${o.usuario||'portaria'}</strong></span>
+        </div>
+        <span class="occ-data">📅 ${o.dataStr}</span>
+      </div>
+      <div class="occ-texto">${o.texto}</div>
+      <div class="occ-actions-row">
+        <button class="btn-sm btn-sm-red" onclick="excluirOcorrencia(${o.id})">🗑 Excluir</button>
+      </div>
+    </div>`).join('');
+}
+
+function exportarCSV(){
+  if(!registros.length){alert('Nenhum dado para exportar.');return;}
+  const cols=['Nome','CPF','Telefone','E-mail','Aniversário','Idoso','Bloco','Unidade','Vaga','Moradores','Visitantes','Observações','Data'];
+  const rows=registros.map(r=>[
+    r.nome,r.cpf,r.tel,r.email,r.aniversario,r.idoso?'Sim':'Não',
+    r.bloco,r.unidade,r.vaga,
+    (r.moradores||[]).filter(Boolean).join(' | '),
+    (r.visitantes||[]).filter(Boolean).join(' | '),
+    r.obs,r.data
+  ].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv='\uFEFF'+[cols.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`jardim_paulista_${hj()}.csv`;
+  a.click();
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function shake(el){
+  [0,8,-8,6,-6,0].forEach((x,i)=>setTimeout(()=>{el.style.transform=`translateX(${x}px)`;},i*60));
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharModalBtn();});
+</script>
+</div><!-- end app-content -->
+
+<script>
+// ── LOGIN ──────────────────────────────────────────────────────────────────
+// USUÁRIOS E SENHAS — edite aqui para personalizar
+const usuarios = {
+  'portaria':  'jardim2024',
+  'sindico':   'sindico@2024',
+  'admin':     'admin@2024'
+};
+
+function fazerLogin(){
+  const user = document.getElementById('login-user').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  const erro = document.getElementById('login-error');
+
+  if(usuarios[user] && usuarios[user] === pass){
+    // Login correto
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-content').style.display='contents';
+    sessionStorage.setItem('jp_logado','1');
+    sessionStorage.setItem('jp_user', user);
+    erro.classList.remove('show');
+  } else {
+    // Login incorreto
+    erro.classList.add('show');
+    document.getElementById('login-pass').value='';
+    document.getElementById('login-pass').classList.add('error');
+    setTimeout(()=>document.getElementById('login-pass').classList.remove('error'),1500);
+  }
+}
+
+// Verificar se já está logado na sessão
+if(sessionStorage.getItem('jp_logado')==='1'){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-content').style.display='contents';
+}
+
+function logout(){
+  sessionStorage.removeItem('jp_logado');
+  sessionStorage.removeItem('jp_user');
+  location.reload();
+}
+</script>
+</body>
+</html>
